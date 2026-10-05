@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Bento Dashboard</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        f1red: '#e10600',
+                        bentoBg: '#111113',
+                        bentoBorder: '#222226'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            /* Subtle grid background */
+            background-image: radial-gradient(#222 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        /* Bento Box Base Styling */
+        .bento-box {
+            background-color: theme('colors.bentoBg');
+            border: 1px solid theme('colors.bentoBorder');
+            border-radius: 1.5rem; /* 24px rounded corners */
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .bento-box:hover {
+            border-color: #444;
+            transform: translateY(-2px);
+        }
+
+        /* Hide scrollbar for clean UI */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+    </style>
+
+    <!-- Load Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Load OrbitControls -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <header class="w-full max-w-7xl mx-auto mb-8 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-f1red rounded-xl flex items-center justify-center font-bold text-xl">
+                F1
+            </div>
+            <h1 class="text-2xl font-bold tracking-tight">Bento<span class="text-gray-500">Dash</span></h1>
+        </div>
+        <div class="font-mono text-xs text-gray-500 border border-gray-800 rounded-full px-4 py-2 bg-black/50 backdrop-blur-md">
+            LIVE TELEMETRY: <span class="text-green-500">CONNECTED</span>
+        </div>
+    </header>
+
+    <main class="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[220px]">
+
+        <!-- 1. Interactive 3D F1 Car Box -->
+        <div class="bento-box md:col-span-2 md:row-span-2 flex flex-col relative group cursor-grab active:cursor-grabbing">
+            <!-- 3D Canvas Container -->
+            <div id="canvas-container" class="absolute inset-0 w-full h-full z-0"></div>
+            
+            <!-- UI Overlay within 3D Box -->
+            <div class="relative z-10 p-6 pointer-events-none flex flex-col justify-between h-full bg-gradient-to-t from-black/80 via-transparent to-black/40">
+                <div>
+                    <h2 class="text-xl font-bold text-white mb-1">Aero Concept X</h2>
+                    <p class="text-xs font-mono text-f1red">INTERACTIVE 3D VIEWER</p>
+                </div>
+                <div class="flex justify-between items-end">
+                    <p class="text-sm text-gray-400 max-w-[200px]">Drag to rotate. Scroll to zoom. Powered by Three.js.</p>
+                    <div class="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center bg-black/50">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Driver Box: Max Verstappen -->
+        <div class="bento-box p-5 flex flex-col justify-between bg-gradient-to-br from-[#1e293b] to-bentoBg">
+            <div class="flex justify-between items-start">
+                <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-[#3671C6]">
+                    <img src="https://placehold.co/100x100/3671C6/ffffff?text=VER" alt="Max Verstappen" class="w-full h-full object-cover">
+                </div>
+                <span class="font-mono text-3xl font-black text-white/10">01</span>
+            </div>
+            <div>
+                <p class="text-xs text-[#3671C6] font-mono font-bold mb-1">RED BULL RACING</p>
+                <h3 class="text-xl font-bold">Max Verstappen</h3>
+                <div class="flex gap-4 mt-2 border-t border-white/10 pt-2 text-sm">
+                    <div><span class="text-gray-500 block text-[10px]">WINS</span> 61</div>
+                    <div><span class="text-gray-500 block text-[10px]">PODIUMS</span> 109</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Info Box: Next Race -->
+        <div class="bento-box p-6 flex flex-col justify-center items-center text-center bg-f1red">
+            <p class="text-white/80 text-xs font-mono mb-2 uppercase tracking-widest">Next Race</p>
+            <h3 class="text-2xl font-black uppercase mb-1">Las Vegas</h3>
+            <p class="text-sm text-white/90 font-mono bg-black/20 px-3 py-1 rounded-full">NOV 24</p>
+        </div>
+
+        <!-- 4. Driver Box: Lewis Hamilton -->
+        <div class="bento-box p-5 flex flex-col justify-between bg-gradient-to-br from-[#00A19B]/20 to-bentoBg">
+            <div class="flex justify-between items-start">
+                <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-[#00A19B]">
+                    <img src="https://placehold.co/100x100/00A19B/ffffff?text=HAM" alt="Lewis Hamilton" class="w-full h-full object-cover">
+                </div>
+                <span class="font-mono text-3xl font-black text-white/10">44</span>
+            </div>
+            <div>
+                <p class="text-xs text-[#00A19B] font-mono font-bold mb-1">MERCEDES</p>
+                <h3 class="text-xl font-bold">Lewis Hamilton</h3>
+                <div class="flex gap-4 mt-2 border-t border-white/10 pt-2 text-sm">
+                    <div><span class="text-gray-500 block text-[10px]">WINS</span> 105</div>
+                    <div><span class="text-gray-500 block text-[10px]">CHAMPS</span> 7</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Driver Box: Charles Leclerc -->
+        <div class="bento-box p-5 flex flex-col justify-between bg-gradient-to-br from-[#EF1A2D]/20 to-bentoBg">
+            <div class="flex justify-between items-start">
+                <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-[#EF1A2D]">
+                    <img src="https://placehold.co/100x100/EF1A2D/ffffff?text=LEC" alt="Charles Leclerc" class="w-full h-full object-cover">
+                </div>
+                <span class="font-mono text-3xl font-black text-white/10">16</span>
+            </div>
+            <div>
+                <p class="text-xs text-[#EF1A2D] font-mono font-bold mb-1">FERRARI</p>
+                <h3 class="text-xl font-bold">Charles Leclerc</h3>
+                <div class="flex gap-4 mt-2 border-t border-white/10 pt-2 text-sm">
+                    <div><span class="text-gray-500 block text-[10px]">POLES</span> 26</div>
+                    <div><span class="text-gray-500 block text-[10px]">WINS</span> 7</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Circuits List Box (Spans 2 columns on larger screens) -->
+        <div class="bento-box md:col-span-2 p-6 flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Iconic Circuits</h2>
+                <a href="#" class="text-xs text-gray-400 hover:text-white transition-colors">View All &rarr;</a>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto space-y-3 pr-2">
+                <!-- Circuit Item 1 -->
+                <div class="flex justify-between items-center p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-8 bg-gray-800 rounded flex items-center justify-center font-mono text-[10px] text-gray-400">MC</div>
+                        <div>
+                            <h4 class="font-bold text-sm">Monaco Grand Prix</h4>
+                            <p class="text-xs text-gray-500">Circuit de Monaco</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs font-mono">3.337 km</p>
+                        <p class="text-[10px] text-gray-500">STREET</p>
+                    </div>
+                </div>
+
+                <!-- Circuit Item 2 -->
+                <div class="flex justify-between items-center p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-8 bg-gray-800 rounded flex items-center justify-center font-mono text-[10px] text-gray-400">IT</div>
+                        <div>
+                            <h4 class="font-bold text-sm">Italian Grand Prix</h4>
+                            <p class="text-xs text-gray-500">Autodromo Nazionale Monza</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs font-mono">5.793 km</p>
+                        <p class="text-[10px] text-gray-500">HIGH SPEED</p>
+                    </div>
+                </div>
+
+                <!-- Circuit Item 3 -->
+                <div class="flex justify-between items-center p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-8 bg-gray-800 rounded flex items-center justify-center font-mono text-[10px] text-gray-400">GB</div>
+                        <div>
+                            <h4 class="font-bold text-sm">British Grand Prix</h4>
+                            <p class="text-xs text-gray-500">Silverstone Circuit</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs font-mono">5.891 km</p>
+                        <p class="text-[10px] text-gray-500">CLASSIC</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </main>
+
+    <!-- Javascript for 3D Car Viewer -->
+    <script>
+        // Ensure script runs after HTML elements are fully loaded
+        document.addEventListener("DOMContentLoaded", () => {
+            initThreeJS();
+        });
+
+        function initThreeJS() {
+            const container = document.getElementById('canvas-container');
+            
+            // 1. Setup Scene, Camera, Renderer
+            const scene = new THREE.Scene();
+            
+            // Set camera aspect based on container size
+            const width = container.clientWidth || 600;
+            const height = container.clientHeight || 400;
+            const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+            camera.position.set(5, 3, 5); // Angled view
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            // Append canvas to the container
+            container.appendChild(renderer.domElement);
+
+            // 2. Add Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Soft white light
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 10, 5);
+            scene.add(directionalLight);
+            
+            const fillLight = new THREE.PointLight(0xffffff, 0.5);
+            fillLight.position.set(-5, 5, -5);
+            scene.add(fillLight);
+
+            // 3. Build Primitive F1 Car
+            const carGroup = new THREE.Group();
+
+            // Materials
+            const bodyMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x1e293b, // Dark slate blue
+                roughness: 0.3,
+                metalness: 0.7
+            });
+            const redAccentMat = new THREE.MeshStandardMaterial({ 
+                color: 0xe10600, // F1 Red
+                roughness: 0.2
+            });
+            const tireMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x111111, // Dark black/grey
+                roughness: 0.9,
+                metalness: 0.1
+            });
+            const rimMaterial = new THREE.MeshStandardMaterial({
+                color: 0x888888,
+                metalness: 0.8
+            });
+
+            // 3A. Main Chassis (Long Box)
+            const chassisGeo = new THREE.BoxGeometry(0.8, 0.3, 3.5);
+            const chassis = new THREE.Mesh(chassisGeo, bodyMaterial);
+            chassis.position.y = 0.3;
+            carGroup.add(chassis);
+
+            // 3B. Nose (Slanted/Smaller box at front)
+            const noseGeo = new THREE.BoxGeometry(0.5, 0.2, 1.2);
+            const nose = new THREE.Mesh(noseGeo, redAccentMat);
+            nose.position.set(0, 0.25, 2.35); // positioned at front (+z)
+            carGroup.add(nose);
+
+            // 3C. Front Wing
+            const fWingGeo = new THREE.BoxGeometry(1.6, 0.05, 0.4);
+            const fWing = new THREE.Mesh(fWingGeo, bodyMaterial);
+            fWing.position.set(0, 0.15, 2.8);
+            carGroup.add(fWing);
+
+            // 3D. Rear Wing
+            const rWingMainGeo = new THREE.BoxGeometry(1.4, 0.05, 0.5);
+            const rWingMain = new THREE.Mesh(rWingMainGeo, redAccentMat);
+            rWingMain.position.set(0, 0.8, -1.6);
+            carGroup.add(rWingMain);
+            
+            // Rear Wing Side Plates
+            const rWingSideGeo = new THREE.BoxGeometry(0.05, 0.6, 0.6);
+            const rWingSideL = new THREE.Mesh(rWingSideGeo, bodyMaterial);
+            rWingSideL.position.set(0.7, 0.6, -1.6);
+            carGroup.add(rWingSideL);
+            
+            const rWingSideR = new THREE.Mesh(rWingSideGeo, bodyMaterial);
+            rWingSideR.position.set(-0.7, 0.6, -1.6);
+            carGroup.add(rWingSideR);
+
+            // 3E. Cockpit / Halo 
+            const cockpitGeo = new THREE.BoxGeometry(0.6, 0.3, 0.8);
+            const cockpit = new THREE.Mesh(cockpitGeo, redAccentMat);
+            cockpit.position.set(0, 0.5, 0.2);
+            carGroup.add(cockpit);
+
+            const airboxGeo = new THREE.BoxGeometry(0.4, 0.4, 0.6);
+            const airbox = new THREE.Mesh(airboxGeo, bodyMaterial);
+            airbox.position.set(0, 0.65, -0.4);
+            carGroup.add(airbox);
+
+            // 3F. Wheels (Cylinders)
+            function createWheel(x, z) {
+                const wheelGroup = new THREE.Group();
+                
+                // Tire
+                const tireGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.3, 32);
+                const tire = new THREE.Mesh(tireGeo, tireMaterial);
+                tire.rotation.z = Math.PI / 2; // Lay cylinder on its side
+                
+                // Rim
+                const rimGeo = new THREE.CylinderGeometry(0.2, 0.2, 0.32, 16);
+                const rim = new THREE.Mesh(rimGeo, rimMaterial);
+                rim.rotation.z = Math.PI / 2;
+
+                wheelGroup.add(tire);
+                wheelGroup.add(rim);
+                
+                wheelGroup.position.set(x, 0.35, z);
+                return wheelGroup;
+            }
+
+            // Front Left, Front Right, Rear Left, Rear Right
+            carGroup.add(createWheel(0.9, 1.8));
+            carGroup.add(createWheel(-0.9, 1.8));
+            carGroup.add(createWheel(0.9, -1.3));
+            carGroup.add(createWheel(-0.9, -1.3));
+
+            // Add car to scene
+            scene.add(carGroup);
+
+            // 4. Setup OrbitControls
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.autoRotate = true; // Slowly rotate by default
+            controls.autoRotateSpeed = 1.0;
+            controls.enableZoom = true;
+            controls.enablePan = false; // Prevent dragging out of view
+            // Limit vertical rotation to not go under the "floor"
+            controls.maxPolarAngle = Math.PI / 2 + 0.1; 
+            controls.minDistance = 3;
+            controls.maxDistance = 10;
+
+            // 5. Animation Loop
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                // Update controls for damping and auto-rotate
+                controls.update();
+
+                // Render scene
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // 6. Handle Resize
+            window.addEventListener('resize', () => {
+                // Get new container dimensions
+                const newWidth = container.clientWidth;
+                const newHeight = container.clientHeight;
+                
+                // Only update if dimensions exist (to prevent errors if hidden)
+                if(newWidth > 0 && newHeight > 0) {
+                    camera.aspect = newWidth / newHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(newWidth, newHeight);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
